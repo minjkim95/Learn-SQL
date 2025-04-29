@@ -194,16 +194,21 @@ FROM Sales;
 #1. Write a query to create a view named Total_Sales that displays the total sales amount for each product along with their names and categories.
 create view Total_Sales as
 select total_price, quantity_sold, product_name, category from sales as s join products as p on s.product_id = p.product_id;
-select * from Total_Sales;
 
 #2. Retrieve the product details (name, category, unit price) for products that have a quantity sold greater than the average quantity sold across all products.
 select product_name, category, unit_price, quantity_sold from products join sales on (products.product_id = sales.product_id)
 where quantity_sold > (select avg(quantity_sold) from sales); 
 
 #3. Explain the significance of indexing in SQL databases and provide an example scenario where indexing could significantly improve query performance in the given schema.
+
 #4. Add a foreign key constraint to the Sales table that references the product_id column in the Products table.
-#5. Create a view named Top_Products that lists the top 3 products based on the total quantity sold.
-create view Top_Products as
+select * from sales s join products p on s.product_id = p.product_id; 
+ALTER TABLE sales
+ADD FOREIGN KEY (product_id)
+references products(product_id);
+describe sales; 
+ 
+#5. Create a view named Top_Products that lists the top 3 products 
 select quantity_sold, product_name from products join sales on products.product_id = sales.product_id 
 order by quantity_sold desc
 limit 3;
@@ -211,10 +216,40 @@ select* from Top_Products;
 
 #6. Implement a transaction that deducts the quantity sold from the Products table when a sale is made in the Sales table, ensuring that both operations are either committed or rolled back together.
 #7. Create a query that lists the product names along with their corresponding sales count.
+select product_name, quantity_sold from sales s join products p on s.product_id = p.product_id; 
+
 #8. Write a query to find all sales where the total price is greater than the average total price of all sales.
+select product_id, total_price from sales
+where total_price > (select avg(total_price) from sales); 
+
 #9. Analyze the performance implications of indexing the sale_date column in the Sales table, considering the types of queries commonly executed against this column.
+
 #10. Add a check constraint to the quantity_sold column in the Sales table to ensure that the quantity sold is always greater than zero.
+
 #11. Create a view named Product_Sales_Info that displays product details along with the total number of sales made for each product.
+create view Product_Sales_Info as
+select quantity_sold, product_name from sales s join products p on s.product_id = p.product_id;
+select * from Product_Sales_Info;
+
 #12. Develop a stored procedure named Update_Unit_Price that updates the unit price of a product in the Products table based on the provided product_id.
-#13. Implement a transaction that inserts a new product into the Products table and then adds a corresponding sale record into the Sales table, ensuring that both operations are either fully completed or fully rolled back.
+
+#13. Implement a transaction that inserts a new product into the Products table and then adds a corresponding
+# sale record into the Sales table, ensuring that both operations are either fully completed or fully rolled back.
+select* from products; 
+
+start transaction; 
+
+Savepoint savepoint1; 
+
+insert into products (product_id, product_name, category, unit_price) values
+(106, "Onion", "Grocery", 1.00),
+(107, "Diaper", "Baby", 2.00);
+
+select * from products;
+
+rollback to savepoint savepoint1; 
+
+select * from products;
+
 #14. Write a query that calculates the total revenue generated from each category of products for the year 2024.
+
